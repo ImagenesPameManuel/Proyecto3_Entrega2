@@ -1,7 +1,7 @@
 #Pamela Ramírez González #Código: 201822262
 #Manuel Gallegos Bustamante #Código: 201719942
-#Análisis y procesamiento de imágenes: Proyecto3 Entrega1
-##Se importan librerías que se utilizarán para el desarrollo del laboratorio
+#Análisis y procesamiento de imágenes: Proyecto3 Entrega2
+#Se importan librerías que se utilizarán para el desarrollo del laboratorio
 import numpy as np
 from skimage.filters import threshold_otsu
 import skimage.io as io
@@ -13,9 +13,8 @@ import cv2
 import glob
 import pandas
 ##input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
-img = glob.glob(os.path.join('data_mp3','blood_cell_dataset', 'noisy_data', '*.png')) # se importan las imagenes
+img = glob.glob(os.path.join('data_mp3','blood_cell_dataset', 'noisy_data', '*.png')) # se importan las imágenes
 preprocesadas=[] # lista para almacenar imágenes
-#os.mkdir(os.path.join('data_mp3','blood_cell_dataset',"preprocesadas"))   #print(img)
 for i in img:
     carga_color_image=io.imread(i)
     imagen_en_Lab = cv2.cvtColor(carga_color_image, cv2.COLOR_BGR2LAB)  # se convierte de rgb a Lab con librería cv2
@@ -23,44 +22,9 @@ for i in img:
     espacio_L = filtrado[:, :, 0]  # se extraen canales de la imagen en el espacio de color La*b
     espacio_a = filtrado[:, :, 1]
     espacio_b = filtrado[:, :, 2]
-    #filtrado_grises=cv2.cvtColor(cv2.cvtColor(filtrado, cv2.COLOR_LAB2RGB),cv2.COLOR_RGB2GRAY) #umbral=threshold_otsu(filtrado_grises)
-    umbral = threshold_otsu(espacio_b)
-    #print(umbral)    #binarizada=filtrado_grises<umbral
+    umbral = threshold_otsu(espacio_b) #cálculo del umbral de otsu y binarización de la imagen
     binarizada = espacio_b < umbral
-    #print(type(binarizada))    #os.chdir(os.path.join('data_mp3','blood_cell_dataset',"preprocesadas"))
-    #cont=1    #cv2.imwrite(os.path.join('data_mp3','blood_cell_dataset',"preprocesadas","prepros_cell"+str(cont)+".png"),binarizada)     #cont+=1
-    preprocesadas.append(binarizada)
-    #print(binarizada*1) #break
-# se grafican algunas imagenes con su respectivo preprocesamiento
-plt.figure()
-plt.subplot(4,2,1)
-plt.text(5, 7, "Imágenes\noriginales",fontsize=13,verticalalignment='top',horizontalalignment='center')
-plt.xlim([0, 10])
-plt.ylim([0, 10])
-plt.axis("off")
-plt.subplot(4, 2, 2)
-plt.text(5, 7, "Imágenes\npreprocesadas",fontsize=13,verticalalignment='top',horizontalalignment='center')
-plt.xlim([0, 10])
-plt.ylim([0, 10])
-plt.axis("off")
-plt.subplot(4, 2, 3)
-plt.imshow(io.imread(os.path.join('data_mp3','blood_cell_dataset', 'noisy_data', 'cell_1.png')))
-plt.axis("off")
-plt.subplot(4, 2, 4)
-plt.imshow(preprocesadas[0],cmap="gray")
-plt.axis("off")
-plt.subplot(4, 2, 5)
-plt.imshow(io.imread(os.path.join('data_mp3','blood_cell_dataset', 'noisy_data', 'cell_9.png')))
-plt.axis("off")
-plt.subplot(4, 2, 6)
-plt.imshow(preprocesadas[9],cmap="gray")
-plt.axis("off")
-plt.subplot(4, 2, 7)
-plt.imshow(io.imread(os.path.join('data_mp3','blood_cell_dataset', 'noisy_data', 'cell_7.png')))
-plt.axis("off")
-plt.subplot(4, 2, 8)
-plt.imshow(preprocesadas[7],cmap="gray")
-plt.axis("off")
+    preprocesadas.append(binarizada) #se añade nueva imagen preprocesada a arreglo
 ##input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
 prueba_star=io.imread(os.path.join('data_mp3', 'star_binary.png')) # se importa la imagen de prueba
 def ImgComplemento(img): # funcion para calcular el complemento
@@ -98,27 +62,6 @@ def MyHoleFiller_201719942_201822262(bin_img):
             fin = True # condición de parada: si el marcador anterior es igual al actual
     whole_img=ImgComplemento(marcador)
     return whole_img # se retorna el resultado
-plt.figure() # se plotea la imagen original y la rellenada para la prueba de la estrellita :)
-plt.subplot(1, 2, 1)
-plt.title("Imagen original")
-plt.imshow(prueba_star,cmap="gray")
-plt.axis("off")
-plt.subplot(1, 2, 2)
-plt.title("Imagen rellenada")
-plt.imshow(MyHoleFiller_201719942_201822262(prueba_star),cmap="gray")
-plt.axis("off")
-plt.show()
-##input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
-plt.figure() # se plotea la imagen original y la rellenada para la imagen de celulas
-plt.subplot(1, 2, 1)
-plt.title("Imagen original")
-plt.imshow(preprocesadas[7],cmap="gray")
-plt.axis("off")
-plt.subplot(1, 2, 2)
-plt.title("Imagen rellenada")
-plt.imshow(MyHoleFiller_201719942_201822262(preprocesadas[7]),cmap="gray")
-plt.axis("off")
-plt.show()
 ##input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
 #cálculo de índices de Jaccard y hematocritos
 def hematocrito(img): # función para calculra hematocrito
@@ -158,35 +101,6 @@ print("\n% Hematocrito predicciones sin huecos:\n",hematocrito_llenas)
 print("\n% Hematocrito anotaciones:\n",hematocrito_anota)
 print("\nErrores cuadráticos:\n",errores)
 print("\nMSE:\n",np.mean(np.array(list(errores.values()))))
-##input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
-plt.figure() # se plotean los resultados
-plt.subplot(4,2,1)
-plt.imshow(anota[0],cmap="gray")
-plt.axis("off")
-plt.axis("off")
-plt.subplot(4, 2, 2)
-plt.imshow(preprocesadas[1],cmap="gray")
-plt.axis("off")
-plt.subplot(4, 2, 3)
-plt.imshow(anota[1])
-plt.axis("off")
-plt.subplot(4, 2, 4)
-plt.imshow(preprocesadas[0],cmap="gray")
-plt.axis("off")
-plt.subplot(4, 2, 5)
-plt.imshow(anota[7])
-plt.axis("off")
-plt.subplot(4, 2, 6)
-plt.imshow(preprocesadas[7],cmap="gray")
-plt.axis("off")
-plt.subplot(4, 2, 7)
-plt.imshow(anota[3])
-plt.axis("off")
-plt.subplot(4, 2, 8)
-plt.imshow(preprocesadas[3],cmap="gray")
-plt.axis("off")
-plt.show()
-
 ##input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
 def interseccion(cor_x1_anotacion, cor_y1_anotacion, cor_x1_prediccion, cor_y1_prediccion, dim_anot, dim_pred): # funcion para calcularla intersección dadas las cordenadas y las dimensiones de dos cuadros
     # caso 1: en el que hay un cuadrado en la esquina superior izquierda
@@ -261,38 +175,20 @@ def resultados(umbral):
         resultados_precision[i] = precision(resultados_umbral1) # calculo de la precisión
         resultados_cobertura[i] = cobertura(resultados_umbral1) # cálculo de la cobretura
         fs[i] = f_medida(resultados_precision[i], resultados_cobertura[i]) # se llena un arreglo con las f medidas
-    prom = np.trapz(resultados_precision, resultados_cobertura) # se calcula el área bajo la curva
+    prom = abs(np.trapz(resultados_precision, resultados_cobertura)) # se calcula el área bajo la curva
     return resultados_cobertura, resultados_precision, max(fs), prom  # se retorna la f medida máxima y los otros resultados
 def f_medida(precision, cobertura):
     return (2 * precision * cobertura)/(precision + cobertura) # cálculo de f-medida con la fórmula
-
 resultado_05_fs, resultado_05_prom = resultados(0.5)[2], resultados(0.5)[3] # cálculo resultados para distintos umbrales
 resultado_75_fs, resultado_75_prom = resultados(0.75)[2], resultados(0.75)[3]
 resultado_95_fs, resultado_95_prom = resultados(0.95)[2], resultados(0.95)[3]
-
 print(resultado_05_fs, resultado_05_prom) # visualización de resultados
 print(resultado_75_fs, resultado_75_prom)
 print(resultado_95_fs, resultado_95_prom)
-
 ##input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
-plt.figure() # se plotean las curvas para cada uno de los umbrales
-plt.subplot(1, 3, 1)
-plt.title("Curva precisión cobertura\npara un IoU de 0.5")
-plt.plot(resultados(0.5)[0], resultados(0.5)[1])
-plt.tight_layout()
-plt.xlim(0, 1)
-plt.ylim(0, 1)
-plt.subplot(1, 3, 2)
-plt.title("Curva precisión cobertura\npara un IoU de 0.75")
-plt.plot(resultados(0.75)[0], resultados(0.75)[1])
-plt.tight_layout()
-plt.xlim(0, 1)
-plt.ylim(0, 1)
-plt.subplot(1, 3, 3)
-plt.title("Curva precisión cobertura\npara un IoU de 0.95")
-plt.plot(resultados(0.95)[0], resultados(0.95)[1])
-plt.tight_layout()
-plt.xlim(0, 1)
-plt.ylim(0, 1)
-plt.show()
+def MyConnComp_201719942_201822262(binary_image,conn=4):
+    elemt_struct = np.array([[0, 1, 0], [1, 1, 1], [0, 1, 0]])  # elemento estructurante para conectividad default 4
+    if conn==8:
+        elemt_struct = np.array([[1, 1, 1], [1, 1, 1], [1, 1, 1]])  # elemento estructurante para conectividad 8
 
+    return labeled_image,pixel_labels
