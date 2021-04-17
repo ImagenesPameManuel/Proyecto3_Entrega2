@@ -214,7 +214,7 @@ def MyConnComp_201719942_201822262(binary_image, conn = 4):
                 mask = mask - papel_cal # se quita el componente conexo
                 labeled_image += tatuaje * papel_cal
                 tatuaje += 1
-                print("entra")
+                #print("entra")
     #print(labeled_image)
     pixel_labels = np.array([])
     for t in range(1, tatuaje):
