@@ -186,9 +186,44 @@ print(resultado_05_fs, resultado_05_prom) # visualización de resultados
 print(resultado_75_fs, resultado_75_prom)
 print(resultado_95_fs, resultado_95_prom)
 ##input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
-def MyConnComp_201719942_201822262(binary_image,conn=4):
+def MyConnComp_201719942_201822262(binary_image, conn = 4):
     elemt_struct = np.array([[0, 1, 0], [1, 1, 1], [0, 1, 0]])  # elemento estructurante para conectividad default 4
-    if conn==8:
+    if conn == 8:
         elemt_struct = np.array([[1, 1, 1], [1, 1, 1], [1, 1, 1]])  # elemento estructurante para conectividad 8
+    mask = np.copy(binary_image)
+    labeled_image = np.zeros((len(binary_image), len(binary_image[0])))
+    tatuaje = 1
+    for i in range(len(binary_image)):
+        for j in range(len(binary_image[0])):
+            if mask[i][j] == 1:
+                papel_cal = np.zeros((len(binary_image), len(binary_image[0])))
+                papel_cal[i][j] = mask[i][j]
+                fin = False
+                while fin == False:
+                    previo = np.copy(papel_cal)  # se copia el marcador anterior
+                    papel_cal = binary_dilation(papel_cal, elemt_struct).astype(papel_cal.dtype)  # se realiza una dilatación del marcador con el elemento estructurante
+                    papel_cal = papel_cal + mask  # se hace una suma de las matrices para revisar la intersección
+                    for i in range(len(papel_cal)):
+                        for j in range(len(papel_cal[0])):
+                            if papel_cal[i][j] > 1:  # dónde haya interseccion se preserva con un 1
+                                papel_cal[i][j] = 1
+                            else:
+                                papel_cal[i][j] = 0  # dónde no hay intersección se convierte en fondo con un 0
+                    if np.array_equal(previo, papel_cal):
+                        fin = True  # condición de parada: si el marcador anterior es igual al actual
+                mask = mask - papel_cal # se quita el componente conexo
+                labeled_image += tatuaje * papel_cal
+                tatuaje += 1
+    pixel_labels = np.array([])
+    for t in range(1, tatuaje):
+        xces = np.array([])
+        yes = np.array([])
+        for z in range(len(labeled_image)):
+            for j in range(len(labeled_image[0])):
+                if t ==  labeled_image[z][j]:
+                    xces = np.append(xces, z)
+                    yes = np.append(yes, j)
 
-    return labeled_image,pixel_labels
+        pixel_labels = np.append(pixel_labels, np.ravel_multi_index((xces, yes), (len(binary_image), len(binary_image[0]))))
+
+    return labeled_image, pixel_labels
