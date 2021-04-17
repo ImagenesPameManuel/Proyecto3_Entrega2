@@ -203,12 +203,12 @@ def MyConnComp_201719942_201822262(binary_image, conn = 4):
                     previo = np.copy(papel_cal)  # se copia el marcador anterior
                     papel_cal = binary_dilation(papel_cal, elemt_struct).astype(papel_cal.dtype)  # se realiza una dilatación del marcador con el elemento estructurante
                     papel_cal = papel_cal + mask  # se hace una suma de las matrices para revisar la intersección
-                    for i in range(len(papel_cal)):
-                        for j in range(len(papel_cal[0])):
-                            if papel_cal[i][j] > 1:  # dónde haya interseccion se preserva con un 1
-                                papel_cal[i][j] = 1
+                    for ii in range(len(papel_cal)):
+                        for jj in range(len(papel_cal[0])):
+                            if papel_cal[ii][jj] > 1:  # dónde haya interseccion se preserva con un 1
+                                papel_cal[ii][jj] = 1
                             else:
-                                papel_cal[i][j] = 0  # dónde no hay intersección se convierte en fondo con un 0
+                                papel_cal[ii][jj] = 0  # dónde no hay intersección se convierte en fondo con un 0
                     if np.array_equal(previo, papel_cal):
                         fin = True  # condición de parada: si el marcador anterior es igual al actual
                 mask = mask - papel_cal # se quita el componente conexo
@@ -227,6 +227,7 @@ def MyConnComp_201719942_201822262(binary_image, conn = 4):
                     yes.append(j)
         pixel_labels = np.append(pixel_labels, np.ravel_multi_index((xces, yes), (len(binary_image), len(binary_image[0]))))
     return labeled_image, pixel_labels
+##
 prueba_frutas=io.imread(os.path.join('data_mp3', 'fruits_binary.png')) # se importa la imagen de prueba
 for i in range(len(prueba_frutas)):
     for j in range(len(prueba_frutas[0])):
@@ -270,13 +271,12 @@ plt.subplot(1,3,1)
 plt.title("Imagen original")
 plt.axis("off")
 plt.imshow(imagen_creada1,cmap="gray")
-##
 plt.subplot(1,3,2)
-plt.title("Imagen componentes conexos con 4 vecindad")
+plt.title("Imagen componentes\nconexos con 4 vecindad")
 plt.axis("off")
 plt.imshow(MyConnComp_201719942_201822262(imagen_creada1)[0],cmap="gray")
 plt.subplot(1,3,3)
-plt.title("Imagen componentes conexos con 8 vecindad")
+plt.title("Imagen componentes\nconexos con 8 vecindad")
 plt.axis("off")
 plt.imshow(MyConnComp_201719942_201822262(imagen_creada1,conn=8)[0],cmap="gray")
 plt.show()
