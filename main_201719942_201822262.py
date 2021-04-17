@@ -214,6 +214,8 @@ def MyConnComp_201719942_201822262(binary_image, conn = 4):
                 mask = mask - papel_cal # se quita el componente conexo
                 labeled_image += tatuaje * papel_cal
                 tatuaje += 1
+                print("entra")
+    #print(labeled_image)
     pixel_labels = np.array([])
     for t in range(1, tatuaje):
         xces = []
@@ -225,5 +227,71 @@ def MyConnComp_201719942_201822262(binary_image, conn = 4):
                     yes.append(j)
         pixel_labels = np.append(pixel_labels, np.ravel_multi_index((xces, yes), (len(binary_image), len(binary_image[0]))))
     return labeled_image, pixel_labels
+prueba_frutas=io.imread(os.path.join('data_mp3', 'fruits_binary.png')) # se importa la imagen de prueba
+for i in range(len(prueba_frutas)):
+    for j in range(len(prueba_frutas[0])):
+        if prueba_frutas[i][j]==255:
+            prueba_frutas[i][j]=1
+plt.figure()
+plt.subplot(1,2,1)
+plt.title("Imagen original")
+plt.axis("off")
+plt.imshow(prueba_frutas,cmap="gray")
+plt.subplot(1,2,2)
+plt.title("Imagen componentes conexos")
+plt.axis("off")
+plt.imshow(MyConnComp_201719942_201822262(prueba_frutas)[0],cmap="gray")
+plt.show()
 ##
-MyConnComp_201719942_201822262(preprocesadas[1])
+imagen_creada1,imagen_creada2=np.zeros((20,20)),np.zeros((20,20))
+imagen_creada1=np.array([[0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0],
+                         [0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0],
+                         [0,0,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0],
+                         [0,1,1,0,1,1,1,0,1,1,0,0,0,0,0,0,0,0,0,0],
+                         [1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0],
+                         [1,0,1,1,1,1,1,1,1,0,1,0,0,0,0,0,0,0,0,0],
+                         [1,0,1,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0],
+                         [0,0,0,1,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0],
+                         [0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0],
+                         [0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0],
+                         [0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,0,0],
+                         [0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,1,0,1,1,0],
+                         [0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1],
+                         [0,0,0,0,0,0,0,0,0,1,0,1,1,1,1,1,1,1,0,1],
+                         [0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,1,0,1],
+                         [0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,0,0,0],
+                         [0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0],
+                         [0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                         [0,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0],
+                         [1,1,0,1,1,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0]])
+##input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
+plt.figure("vecindad_4_8_Igual")
+plt.subplot(1,3,1)
+plt.title("Imagen original")
+plt.axis("off")
+plt.imshow(imagen_creada1,cmap="gray")
+##
+plt.subplot(1,3,2)
+plt.title("Imagen componentes conexos con 4 vecindad")
+plt.axis("off")
+plt.imshow(MyConnComp_201719942_201822262(imagen_creada1)[0],cmap="gray")
+plt.subplot(1,3,3)
+plt.title("Imagen componentes conexos con 8 vecindad")
+plt.axis("off")
+plt.imshow(MyConnComp_201719942_201822262(imagen_creada1,conn=8)[0],cmap="gray")
+plt.show()
+##input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
+plt.figure("vecindad_4_8_Dif")
+plt.subplot(1,3,1)
+plt.title("Imagen original")
+plt.axis("off")
+plt.imshow(imagen_creada2,cmap="gray")
+plt.subplot(1,3,2)
+plt.title("Imagen componentes conexos con 4 vecindad")
+plt.axis("off")
+plt.imshow(MyConnComp_201719942_201822262(imagen_creada2)[0],cmap="gray")
+plt.subplot(1,3,3)
+plt.title("Imagen componentes conexos con 8 vecindad")
+plt.axis("off")
+plt.imshow(MyConnComp_201719942_201822262(imagen_creada2,conn=8)[0],cmap="gray")
+plt.show()
