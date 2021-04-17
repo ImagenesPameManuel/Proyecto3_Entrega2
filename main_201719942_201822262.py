@@ -287,7 +287,7 @@ imagen_creada2=np.array([[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1],
                          [0,0,0,0,0,0,0,0,1,1,1,0,1,1,1,0,0,0,0,0],
                          [0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0]])
 ##input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
-plt.figure("vecindad_4_8_Igual")
+plt.figure("vecindad_4_8_Dif")
 plt.subplot(1,3,1)
 plt.title("Imagen original")
 plt.axis("off")
@@ -302,7 +302,7 @@ plt.axis("off")
 plt.imshow(MyConnComp_201719942_201822262(imagen_creada1,conn=8)[0],cmap="gray")
 plt.show()
 ##input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
-plt.figure("vecindad_4_8_Dif")
+plt.figure("vecindad_4_8_Igual")
 plt.subplot(1,3,1)
 plt.title("Imagen original")
 plt.axis("off")
