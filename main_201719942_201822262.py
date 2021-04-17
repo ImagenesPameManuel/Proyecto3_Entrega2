@@ -220,12 +220,10 @@ def MyConnComp_201719942_201822262(binary_image, conn = 4):
         yes = []
         for z in range(len(labeled_image)):
             for j in range(len(labeled_image[0])):
-                if t ==  labeled_image[z][j]:
+                if t == labeled_image[z][j]:
                     xces.append(z)
                     yes.append(j)
-        print(xces, yes)
         pixel_labels = np.append(pixel_labels, np.ravel_multi_index((xces, yes), (len(binary_image), len(binary_image[0]))))
-        break
     return labeled_image, pixel_labels
 ##
 MyConnComp_201719942_201822262(preprocesadas[1])
