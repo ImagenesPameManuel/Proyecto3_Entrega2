@@ -16,7 +16,7 @@ import os
 import cv2
 import glob
 import pandas
-##input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
+input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
 img = glob.glob(os.path.join('data_mp3','blood_cell_dataset', 'noisy_data', '*.png')) # se importan las imágenes
 preprocesadas=[] # lista para almacenar imágenes
 for i in img:
@@ -29,7 +29,7 @@ for i in img:
     umbral = threshold_otsu(espacio_b) #cálculo del umbral de otsu y binarización de la imagen
     binarizada = espacio_b < umbral
     preprocesadas.append(binarizada) #se añade nueva imagen preprocesada a arreglo
-##input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
+input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
 def ImgComplemento(img): # funcion para calcular el complemento
     complemento = img.copy() # se copia la imagen ingresada por parametro
     for i in range(len(img)):
@@ -65,7 +65,7 @@ def MyHoleFiller_201719942_201822262(bin_img):
             fin = True # condición de parada: si el marcador anterior es igual al actual
     whole_img=ImgComplemento(marcador)
     return whole_img # se retorna el resultado
-##input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
+input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
 def MyConnComp_201719942_201822262(binary_image, conn = 4):
     elemt_struct = np.array([[0, 1, 0], [1, 1, 1], [0, 1, 0]])  # elemento estructurante para conectividad default 4
     if conn == 8:
@@ -108,7 +108,7 @@ def MyConnComp_201719942_201822262(binary_image, conn = 4):
 prueba_frutas=io.imread(os.path.join('data_mp3', 'fruits_binary.png')) # se importa la imagen de prueba
 # se binariza la imagen cambiando valores de 255 por 1
 prueba_frutas=prueba_frutas>0
-##input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
+input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
 plt.figure() # se plotea la imagen de las frutas sin utilizar el algoritmo de componentes conexos y con el algoritmo
 plt.subplot(1,2,1)
 plt.title("Imagen original")
@@ -119,11 +119,11 @@ plt.title("Imagen componentes conexos")
 plt.axis("off")
 plt.imshow(MyConnComp_201719942_201822262(prueba_frutas)[0],cmap="gray")
 plt.show()
-##input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
+input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
 # se crean 2 imágenes binarias 20 X 20
 imagen_creada1=np.array([[0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0],[0,1,1,0,1,1,1,0,1,1,0,0,0,0,0,0,0,0,0,0],[1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0],[1,0,1,1,1,1,1,1,1,0,1,0,0,0,0,0,0,0,0,0],[1,0,1,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0],[0,0,0,1,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,0,0],[0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,1,0,1,1,0],[0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1],[0,0,0,0,0,0,0,0,0,1,0,1,1,1,1,1,1,1,0,1],[0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,1,0,1],[0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,0,0,0],[0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0], [0,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0],[1,1,0,1,1,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0]])
 imagen_creada2=np.array([[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,1],[0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1,1],[0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1],[0,1,1,1,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,1,1,1,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0],[0,0,1,1,1,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0],[0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[1,1,1,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,1,1,1,0,1,1,1,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0]])
-##input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
+input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
 plt.figure("vecindad_4_8_Dif") # se aplica el algoritmo para la primera imagen con dos vecindades diferentes y se muestran. se muestra también la imagen original
 plt.subplot(1,3,1)
 plt.title("Imagen original")
@@ -138,7 +138,7 @@ plt.title("Imagen componentes\nconexos con 8 vecindad")
 plt.axis("off")
 plt.imshow(MyConnComp_201719942_201822262(imagen_creada1,conn=8)[0],cmap="gray")
 plt.show()
-##input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
+input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
 plt.figure("vecindad_4_8_Igual") # se aplica el algoritmo para la primera imagen con dos vecindades diferentes y se muestran. se muestra también la imagen original
 plt.subplot(1,3,1)
 plt.title("Imagen original")
@@ -153,7 +153,7 @@ plt.title("Imagen componentes\nconexos con 8 vecindad")
 plt.axis("off")
 plt.imshow(MyConnComp_201719942_201822262(imagen_creada2,conn=8)[0],cmap="gray")
 plt.show()
-##input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
+input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
 img = glob.glob(os.path.join('data_mp3','blood_cell_dataset', 'noisy_data', '*.png')) # se importan las imágenes
 #num_rand=random.randint(0,9) #proceso para hallar imagen de prueba de forma aleatoria
 #print(num_rand) #=7
@@ -175,7 +175,7 @@ def watershed_select(image,marcadores=False,min_h=40): # función para calcular 
         return segmen.watershed(grad,markers=conexos,watershed_line=True) ,conexos # se hace watershed
     else:
         return segmen.watershed(grad,watershed_line=True) # por default se hace watershed sin marcadores
-##input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
+input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
 plt.figure() # se plotean las imágenes resultantes
 plt.subplot(1,3,1)
 plt.title("Imagen original preprocesada")
@@ -190,7 +190,7 @@ plt.title("Watershed sin\nmardadores definidos")
 plt.axis("off")
 plt.imshow(watershed_select(preprocesamiento(carga_prueba)),cmap="gray")
 plt.show()
-##input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
+input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
 plt.figure() # se plotean las imágenes resultantes
 plt.subplot(2,2,1)
 plt.title("Imagen original preprocesada")
@@ -210,7 +210,7 @@ plt.title("Watershed\nmardadores definidos")
 plt.axis("off")
 plt.imshow(watershed_select(preprocesamiento(carga_prueba),marcadores=True,min_h=255-threshold_otsu(preprocesamiento(carga_prueba)))[0] ,cmap="gray")
 plt.show()
-##input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
+input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
 #carga anotaciones y cálculo de índices de Jaccard para método entrega 1
 img_anot = glob.glob(os.path.join('data_mp3','blood_cell_dataset', 'groundtruth', '*.png')) # lectura de imagenes
 anota,jaccards_llenas=[],{}# diccionario para guardar las métricas y lista para guardar anotaciones
@@ -231,7 +231,7 @@ for i in range(len(preprocesadas)):
 valores_llenos=np.array(list(jaccards_llenas.values()))
 print("\nÍndices de Jaccard imágenes sin huecos:\n",jaccards_llenas)
 print("prom llenos",np.mean(valores_llenos),"desv.est",np.std(valores_llenos))
-##input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
+input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
 segm_water={} # lista para almacenar imágenes
 jaccards_sinmark={}
 jaccards_mark={}
