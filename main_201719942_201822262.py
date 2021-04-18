@@ -107,10 +107,7 @@ def MyConnComp_201719942_201822262(binary_image, conn = 4):
     return labeled_image, pixel_labels
 prueba_frutas=io.imread(os.path.join('data_mp3', 'fruits_binary.png')) # se importa la imagen de prueba
 # se binariza la imagen cambiando valores de 255 por 1
-for i in range(len(prueba_frutas)):
-    for j in range(len(prueba_frutas[0])):
-        if prueba_frutas[i][j]==255:
-            prueba_frutas[i][j]=1
+prueba_frutas=prueba_frutas>0
 ##input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
 plt.figure() # se plotea la imagen de las frutas sin utilizar el algoritmo de componentes conexos y con el algoritmo
 plt.subplot(1,2,1)
