@@ -266,6 +266,7 @@ for i in img: # se recorren las imagenes
     index_im+=1
 valores_sinmark=np.array(list(jaccards_sinmark.values()))
 valores_mark=np.array(list(jaccards_mark.values()))
+# se muestran las métricas
 print("\nÍndices de Jaccard imágenes watersheds sin marcadores:\n",jaccards_sinmark)
 print("prom sin marcadores",np.mean(valores_sinmark),"desv.est",np.std(valores_sinmark))
 print("\nÍndices de Jaccard imágenes con marcadores:\n",jaccards_mark)
