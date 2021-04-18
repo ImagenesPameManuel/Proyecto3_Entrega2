@@ -334,23 +334,42 @@ plt.show()
 plt.subplot(2,2,4)
 plt.title("Watershed\nmardadores definidos")
 plt.axis("off")
+
 #plt.imshow(watershed_select(preprocesamiento(carga_prueba),marcadores=True)[0]<mode(watershed_select(preprocesamiento(carga_prueba),marcadores=True)[0].flatten())[0]  ,cmap="gray")
 #bina_prueba=np.where(watershed_select(preprocesamiento(carga_prueba),marcadores=True,min_h=255-threshold_otsu(preprocesamiento(carga_prueba)))[0]<mode(watershed_select(preprocesamiento(carga_prueba),marcadores=True,min_h=255-threshold_otsu(preprocesamiento(carga_prueba)))[0].flatten())[0] , watershed_select(preprocesamiento(carga_prueba),marcadores=True,min_h=255-threshold_otsu(preprocesamiento(carga_prueba)))[0]>mode(watershed_select(preprocesamiento(carga_prueba),marcadores=True,min_h=255-threshold_otsu(preprocesamiento(carga_prueba)))[0].flatten())[0] ,1,0)
-#plt.imshow(bina_prueba ,cmap="gray")
+"""bina_prueba=watershed_select(preprocesamiento(carga_prueba),marcadores=True,min_h=255-threshold_otsu(preprocesamiento(carga_prueba)))[0].copy()
+moda=mode(bina_prueba.flatten())[0]
+for i in range(len(bina_prueba)):
+    for j in range(len(bina_prueba[0])):
+        if bina_prueba[i][j]<moda:
+            bina_prueba[i][j]=1
+        elif bina_prueba[i][j]>moda:
+            bina_prueba[i][j] = 1
+        else:
+            bina_prueba[i][j] = 0
+plt.imshow(bina_prueba ,cmap="gray")"""
 
-plt.imshow(watershed_select(preprocesamiento(carga_prueba),marcadores=True,min_h=255-threshold_otsu(preprocesamiento(carga_prueba)))[0] ,cmap="gray")
+#plt.imshow(watershed_select(preprocesamiento(carga_prueba),marcadores=True,min_h=255-threshold_otsu(preprocesamiento(carga_prueba)))[0] ,cmap="gray")
 plt.show()
 ##input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
 segm_water={} # lista para almacenar imágenes
 jaccards_sinmark={}
 jaccards_mark={}
+index_im = 0
 for i in img:
-    index_im=0
     carga_color=io.imread(i)
     preprocesa=preprocesamiento(carga_color)
-    segm_sinmarcadores=watershed_select(preprocesa)
+    segm_sinmarcadores=watershed_select(preprocesa)>0
     segm_marcadores=watershed_select(preprocesa,marcadores=True,min_h=255-threshold_otsu(preprocesa))[0]
-
+    segm_marcadores_bin = segm_marcadores.copy()
+    moda = mode(segm_marcadores_bin.flatten())[0]
+    for i in range(len(segm_marcadores_bin)):
+        for j in range(len(segm_marcadores_bin[0])):
+            if segm_marcadores_bin[i][j] < moda or segm_marcadores_bin[i][j] > moda:
+                segm_marcadores_bin[i][j] = 1
+            else:
+                segm_marcadores_bin[i][j] = 0
+    plt.imshow(segm_marcadores_bin, cmap="gray")
     i_dict, i_anota = index_im, index_im  # indices correspondientes al número de la imagen
     if index_im == 1:  # condicionales para excepciones en el orden correspondiente
         i_dict = 10
@@ -358,9 +377,9 @@ for i in img:
     elif index_im == 0:
         i_dict = index_im+ 1
         i_anota = 1
-    segm_water[i_dict]=[preprocesa,segm_sinmarcadores,segm_marcadores]
+    segm_water[i_dict]=[preprocesa,segm_sinmarcadores,segm_marcadores_bin]
     jaccards_sinmark[i_dict] = skmetr.jaccard_score(anota[i_anota].flatten(), segm_sinmarcadores.flatten())  # cálculo de métricas y asignación de valores en los diccionarios haciendo uso de las anotaciones e imagenes correspondientes
-    jaccards_mark[i_dict] = skmetr.jaccard_score(anota[i_anota].flatten(), segm_marcadores.flatten())
+    jaccards_mark[i_dict] = skmetr.jaccard_score(anota[i_anota].flatten(), segm_marcadores_bin.flatten())
     index_im+=1
 valores_sinmark=np.array(list(jaccards_sinmark.values()))
 valores_mark=np.array(list(jaccards_mark.values()))
