@@ -30,7 +30,6 @@ for i in img:
     binarizada = espacio_b < umbral
     preprocesadas.append(binarizada) #se añade nueva imagen preprocesada a arreglo
 ##input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
-prueba_star=io.imread(os.path.join('data_mp3', 'star_binary.png')) # se importa la imagen de prueba
 def ImgComplemento(img): # funcion para calcular el complemento
     complemento = img.copy() # se copia la imagen ingresada por parametro
     for i in range(len(img)):
@@ -66,130 +65,6 @@ def MyHoleFiller_201719942_201822262(bin_img):
             fin = True # condición de parada: si el marcador anterior es igual al actual
     whole_img=ImgComplemento(marcador)
     return whole_img # se retorna el resultado
-##input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
-#cálculo de índices de Jaccard y hematocritos
-def hematocrito(img): # función para calculra hematocrito
-    red_cells=np.count_nonzero(img == 1) # se cuentarn los pixeles de celula de la imagen
-    total_pixels=img.shape[0]
-    porcentaje_hematocrito=red_cells/total_pixels # aplicacion de la fórmula propuesta en la guía
-    return porcentaje_hematocrito
-img_anot = glob.glob(os.path.join('data_mp3','blood_cell_dataset', 'groundtruth', '*.png')) # lectura de imagenes
-anota,errores=[],{}
-jaccards_huecos,jaccards_llenas={},{}
-hematocrito_anota,hematocrito_llenas={},{} # diccionario para guardar las métricas y hematocritos como valores de las llaves que indican el número de la imagen de esta métrica
-for i in img_anot:
-    carga=io.imread(i)>0
-    anota.append(carga) # se realiza la carga y umbralización de imagenes
-##
-for i in range(len(preprocesadas)):
-    llena=MyHoleFiller_201719942_201822262(preprocesadas[i]).flatten() # se rellenan los huecos
-    i_dict,i_anota=i,i #indices correspondientes al número de la imagen
-    if i == 1: # condicionales para excepciones en el orden correspondiente
-        i_dict=10
-        i_anota=0
-    elif i==0:
-        i_dict = i+1
-        i_anota=1
-    jaccards_huecos[i_dict] = skmetr.jaccard_score(anota[i_anota].flatten(), preprocesadas[i].flatten()) #cálculo de métricas y asignación de valores en los diccionarios haciendo uso de las anotaciones e imagenes correspondientes
-    jaccards_llenas[i_dict] = skmetr.jaccard_score(anota[i_anota].flatten(), llena)
-    hematocrito_llenas[i_dict] = hematocrito(llena)
-    hematocrito_anota[i_dict] = hematocrito(anota[i_anota].flatten())
-    errores[i_dict]=(hematocrito_anota[i_dict]-hematocrito_llenas[i_dict])**2
-# se muestran las métricas
-valores_llenos=np.array(list(jaccards_llenas.values()))
-valores_huecos=np.array(list(jaccards_huecos.values()))
-print("\nÍndices de Jaccard imágenes con huecos:\n",jaccards_huecos)
-print("prom huecos",np.mean(valores_huecos),"desv.est",np.std(valores_huecos))
-print("\nÍndices de Jaccard imágenes sin huecos:\n",jaccards_llenas)
-print("prom llenos",np.mean(valores_llenos),"desv.est",np.std(valores_llenos))
-print("\n% Hematocrito predicciones sin huecos:\n",hematocrito_llenas)
-print("\n% Hematocrito anotaciones:\n",hematocrito_anota)
-print("\nErrores cuadráticos:\n",errores)
-print("\nMSE:\n",np.mean(np.array(list(errores.values()))))
-##input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
-def interseccion(cor_x1_anotacion, cor_y1_anotacion, cor_x1_prediccion, cor_y1_prediccion, dim_anot, dim_pred): # funcion para calcularla intersección dadas las cordenadas y las dimensiones de dos cuadros
-    # caso 1: en el que hay un cuadrado en la esquina superior izquierda
-    def calculo1(izq_x, izq_y, der_x, der_y): #calculo de área compartida entre ambos cuadrados
-        return (izq_x + dim_anot - der_x) * (izq_y + dim_pred - der_y)
-    # caso 2: en el que hay un cuadrado en la esquina superior derecha
-    def calculo2(izq_x, izq_y, der_x, der_y):#calculo de área compartida entre ambos cuadrados
-        return (izq_x + dim_anot - der_x) * (der_y + dim_pred - izq_y)
-    # variables para almacenan coordenadas de los cuadrados
-    c_1 = np.array([cor_x1_anotacion,cor_y1_anotacion])
-    c_2 = np.array([cor_x1_prediccion, cor_y1_prediccion])
-    # caso en el que no hay intersección
-    if (c_1[0] + dim_anot < c_2[0] and c_1[1] + dim_anot < c_2[1]) or (c_2[0] + dim_pred < c_1[0] and c_2[1] + dim_pred < c_1[1]):
-        return 0
-    # cálculos del caso 1
-    if min(cor_x1_anotacion, cor_x1_prediccion) == c_1[0] and min(cor_y1_anotacion, cor_y1_prediccion) == c_1[1]:
-        return calculo1(c_1[0], c_1[1], c_2[0], c_2[1]) # la anotación es el cuadro de la esquina superior izquierda
-    elif min(cor_x1_anotacion, cor_x1_prediccion) == c_2[0] and min(cor_y1_anotacion, cor_y1_prediccion) == c_2[1]:
-        return calculo1(c_2[0], c_2[1], c_1[0], c_1[1]) # la predicción es el cuadro de la esquina superior izquierda
-    # cálculos del caso 2
-    if max(cor_x1_anotacion, cor_x1_prediccion) == c_1[0] and min(cor_y1_anotacion, cor_y1_prediccion) == c_1[1]:
-        return calculo2(c_2[0], c_2[1], c_1[0], c_1[1]) # la anotación es el cuadro de la esquina superior derecha
-    elif max(cor_x1_anotacion, cor_x1_prediccion) == c_2[0] and min(cor_y1_anotacion, cor_y1_prediccion) == c_2[1]:
-        return calculo2(c_1[0], c_1[1], c_2[0], c_2[1]) # la predicción es el cuadro de la esquina superior derecha
-# Unión: se resta el área total de los cuadrados con la intersección
-def union(cor_x1_anotacion, cor_y1_anotacion, cor_x1_prediccion, cor_y1_prediccion, dim_anot, dim_pred):
-    return 5000 - interseccion(cor_x1_anotacion, cor_y1_anotacion, cor_x1_prediccion, cor_y1_prediccion, dim_anot, dim_pred)
-# índice Jaccard con la fórmula: intersección/unión
-def jaccard(cor_x1_anotacion, cor_y1_anotacion, cor_x1_prediccion, cor_y1_prediccion, dim_anot, dim_pred):
-    return interseccion(cor_x1_anotacion, cor_y1_anotacion, cor_x1_prediccion, cor_y1_prediccion, dim_anot, dim_pred)/union(cor_x1_anotacion, cor_y1_anotacion, cor_x1_prediccion, cor_y1_prediccion, dim_anot, dim_pred)
-excel = pandas.read_csv(os.path.join('data_mp3', 'detection_groundtruth.csv')) # uso de librería pandas para importar datos
-pred, anot, scores = excel['predictions'], excel['annotations'], excel['scores'] # datos para anotaciones, predicciones y scores
-pred, anot = list(pred), list(anot) #cambio a variables tipo list
-scores, indices_jaccard = np.array(scores), np.zeros(len(pred)) # inicialización de arreglos
-for i in range(len(pred)):
-    prueba_anot, prueba_pred = anot[i].split(','), pred[i].split(',') # split de los datos en las comas
-    dim_anot = int(prueba_anot[3]) # extracción de las dimensiones de la anotación
-    dim_pred = int(prueba_pred[3]) # extraccion de las dimensiones de la predicción
-    indices_jaccard[i] = jaccard(int(prueba_anot[0]), int(prueba_anot[1]), int(prueba_pred[0]), int(prueba_pred[1]), dim_anot, dim_pred)# calculo de IoU para todas las predicciones
-def precision(list):
-    TP = 0
-    FP = 0
-    for i in list:
-        if i == "TP":
-            TP += 1
-        elif i == "FP":
-            FP += 1
-    return TP/(TP + FP) # se utiliza la fórmula de precisión
-def cobertura(list):
-    TP = 0
-    for i in list:
-        if i == "TP":
-            TP += 1
-    return TP/len(list) # se utiliza la definición global de la cobertura
-def resultados(umbral):
-    resultados_precision = np.zeros(100)
-    resultados_cobertura = np.zeros(100) # inicialización de variables
-    fs = np.zeros(100)
-    for i in range(0, 100, 1):
-        resultados_umbral1 = [0] * 100
-        for j in range(len(indices_jaccard)):
-            if indices_jaccard[j] > umbral: # si se sobre pasa el umbral son verdaderas (T)
-                if scores[j] > i / 100: # si se sobrepasa el score son positivas
-                    resultados_umbral1[j] = "TP"
-                else:
-                    resultados_umbral1[j] = "TN" # si no se sobrepasa el score son negativas
-            else: # si no se sobre pasa el umbral son falsas (F)
-                if scores[j] > i / 100:
-                    resultados_umbral1[j] = "FP" # si se sobrepasa el score son positivas
-                else:
-                    resultados_umbral1[j] = "FN" # si no se sobrepasa el score son negativas
-        resultados_precision[i] = precision(resultados_umbral1) # calculo de la precisión
-        resultados_cobertura[i] = cobertura(resultados_umbral1) # cálculo de la cobretura
-        fs[i] = f_medida(resultados_precision[i], resultados_cobertura[i]) # se llena un arreglo con las f medidas
-    prom = abs(np.trapz(resultados_precision, resultados_cobertura)) # se calcula el área bajo la curva
-    return resultados_cobertura, resultados_precision, max(fs), prom  # se retorna la f medida máxima y los otros resultados
-def f_medida(precision, cobertura):
-    return (2 * precision * cobertura)/(precision + cobertura) # cálculo de f-medida con la fórmula
-resultado_05_fs, resultado_05_prom = resultados(0.5)[2], resultados(0.5)[3] # cálculo resultados para distintos umbrales
-resultado_75_fs, resultado_75_prom = resultados(0.75)[2], resultados(0.75)[3]
-resultado_95_fs, resultado_95_prom = resultados(0.95)[2], resultados(0.95)[3]
-print(resultado_05_fs, resultado_05_prom) # visualización de resultados
-print(resultado_75_fs, resultado_75_prom)
-print(resultado_95_fs, resultado_95_prom)
 ##input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
 def MyConnComp_201719942_201822262(binary_image, conn = 4):
     elemt_struct = np.array([[0, 1, 0], [1, 1, 1], [0, 1, 0]])  # elemento estructurante para conectividad default 4
@@ -230,12 +105,12 @@ def MyConnComp_201719942_201822262(binary_image, conn = 4):
                     yes.append(j)
         pixel_labels = np.append(pixel_labels, np.ravel_multi_index((xces, yes), (len(binary_image), len(binary_image[0]))))
     return labeled_image, pixel_labels
-##
 prueba_frutas=io.imread(os.path.join('data_mp3', 'fruits_binary.png')) # se importa la imagen de prueba
 for i in range(len(prueba_frutas)):
     for j in range(len(prueba_frutas[0])):
         if prueba_frutas[i][j]==255:
             prueba_frutas[i][j]=1
+##input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
 plt.figure()
 plt.subplot(1,2,1)
 plt.title("Imagen original")
@@ -246,7 +121,7 @@ plt.title("Imagen componentes conexos")
 plt.axis("off")
 plt.imshow(MyConnComp_201719942_201822262(prueba_frutas)[0],cmap="gray")
 plt.show()
-##
+##input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
 imagen_creada1=np.array([[0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0],[0,1,1,0,1,1,1,0,1,1,0,0,0,0,0,0,0,0,0,0],[1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0],[1,0,1,1,1,1,1,1,1,0,1,0,0,0,0,0,0,0,0,0],[1,0,1,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0],[0,0,0,1,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,0,0],[0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,1,0,1,1,0],[0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1],[0,0,0,0,0,0,0,0,0,1,0,1,1,1,1,1,1,1,0,1],[0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,1,0,1],[0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,0,0,0],[0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0], [0,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0],[1,1,0,1,1,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0]])
 imagen_creada2=np.array([[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,1],[0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1,1],[0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1],[0,1,1,1,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,1,1,1,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0],[0,0,1,1,1,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0],[0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[1,1,1,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,1,1,1,0,1,1,1,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0]])
 ##input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
@@ -301,7 +176,7 @@ def watershed_select(image,marcadores=False,min_h=40):
         return segmen.watershed(grad,markers=conexos,watershed_line=True) ,conexos
     else:
         return segmen.watershed(grad,watershed_line=True)
-##
+##input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
 plt.figure()
 plt.subplot(1,3,1)
 plt.title("Imagen original preprocesada")
@@ -334,23 +209,29 @@ plt.show()
 plt.subplot(2,2,4)
 plt.title("Watershed\nmardadores definidos")
 plt.axis("off")
-
-#plt.imshow(watershed_select(preprocesamiento(carga_prueba),marcadores=True)[0]<mode(watershed_select(preprocesamiento(carga_prueba),marcadores=True)[0].flatten())[0]  ,cmap="gray")
-#bina_prueba=np.where(watershed_select(preprocesamiento(carga_prueba),marcadores=True,min_h=255-threshold_otsu(preprocesamiento(carga_prueba)))[0]<mode(watershed_select(preprocesamiento(carga_prueba),marcadores=True,min_h=255-threshold_otsu(preprocesamiento(carga_prueba)))[0].flatten())[0] , watershed_select(preprocesamiento(carga_prueba),marcadores=True,min_h=255-threshold_otsu(preprocesamiento(carga_prueba)))[0]>mode(watershed_select(preprocesamiento(carga_prueba),marcadores=True,min_h=255-threshold_otsu(preprocesamiento(carga_prueba)))[0].flatten())[0] ,1,0)
-"""bina_prueba=watershed_select(preprocesamiento(carga_prueba),marcadores=True,min_h=255-threshold_otsu(preprocesamiento(carga_prueba)))[0].copy()
-moda=mode(bina_prueba.flatten())[0]
-for i in range(len(bina_prueba)):
-    for j in range(len(bina_prueba[0])):
-        if bina_prueba[i][j]<moda:
-            bina_prueba[i][j]=1
-        elif bina_prueba[i][j]>moda:
-            bina_prueba[i][j] = 1
-        else:
-            bina_prueba[i][j] = 0
-plt.imshow(bina_prueba ,cmap="gray")"""
-
-#plt.imshow(watershed_select(preprocesamiento(carga_prueba),marcadores=True,min_h=255-threshold_otsu(preprocesamiento(carga_prueba)))[0] ,cmap="gray")
+plt.imshow(watershed_select(preprocesamiento(carga_prueba),marcadores=True,min_h=255-threshold_otsu(preprocesamiento(carga_prueba)))[0] ,cmap="gray")
 plt.show()
+##input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
+#carga anotaciones y cálculo de índices de Jaccard para método entrega 1
+img_anot = glob.glob(os.path.join('data_mp3','blood_cell_dataset', 'groundtruth', '*.png')) # lectura de imagenes
+anota,jaccards_llenas=[],{}# diccionario para guardar las métricas y lista para guardar anotaciones
+for i in img_anot:
+    carga=io.imread(i)>0
+    anota.append(carga) # se realiza la carga y umbralización de imagenes
+for i in range(len(preprocesadas)):
+    llena=MyHoleFiller_201719942_201822262(preprocesadas[i]).flatten() # se rellenan los huecos
+    i_dict,i_anota=i,i #indices correspondientes al número de la imagen
+    if i == 1: # condicionales para excepciones en el orden correspondiente
+        i_dict=10
+        i_anota=0
+    elif i==0:
+        i_dict = i+1
+        i_anota=1
+    jaccards_llenas[i_dict] = skmetr.jaccard_score(anota[i_anota].flatten(), llena)#cálculo de métricas y asignación de valores en los diccionarios haciendo uso de las anotaciones e imagenes correspondientes
+# se muestran las métricas
+valores_llenos=np.array(list(jaccards_llenas.values()))
+print("\nÍndices de Jaccard imágenes sin huecos:\n",jaccards_llenas)
+print("prom llenos",np.mean(valores_llenos),"desv.est",np.std(valores_llenos))
 ##input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
 segm_water={} # lista para almacenar imágenes
 jaccards_sinmark={}
@@ -369,7 +250,7 @@ for i in img:
                 segm_marcadores_bin[i][j] = 1
             else:
                 segm_marcadores_bin[i][j] = 0
-    plt.imshow(segm_marcadores_bin, cmap="gray")
+    #plt.imshow(segm_marcadores_bin, cmap="gray")
     i_dict, i_anota = index_im, index_im  # indices correspondientes al número de la imagen
     if index_im == 1:  # condicionales para excepciones en el orden correspondiente
         i_dict = 10
