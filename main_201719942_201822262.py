@@ -291,14 +291,15 @@ def gradiente_morfo(image):
     dilatacion=morfo.dilation(image)
     erosion=morfo.erosion(image)
     return dilatacion-erosion
-def watershed_select(image,marcadores=False,min_h=100):
+def watershed_select(image,marcadores=False,min_h=40):
     grad=gradiente_morfo(image)
     if marcadores==True:
         marks=morfo.h_minima(image,min_h)
-        conexos=MyConnComp_201719942_201822262(marks)
-        return segmen.watershed(grad,mask=conexos,watershed_line=True)
+        conexos=MyConnComp_201719942_201822262(marks)[0]
+        return segmen.watershed(grad,markers=conexos,watershed_line=True)
     else:
         return segmen.watershed(grad,watershed_line=True)
+##
 plt.figure()
 plt.subplot(1,3,1)
 plt.title("Imagen original preprocesada")
@@ -334,4 +335,5 @@ componentes_prueba=MyConnComp_201719942_201822262(watershed_select(gradiente_mor
 plt.imshow(preprocesamiento(carga_prueba),cmap="gray")
 plt.axis("off")
 ##
-plt.imshow(morfo.h_minima((preprocesamiento(carga_prueba)),100))
+plt.imshow(morfo.h_minima((preprocesamiento(carga_prueba)),100),cmap="gray")
+##
