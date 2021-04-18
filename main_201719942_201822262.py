@@ -72,8 +72,8 @@ def MyConnComp_201719942_201822262(binary_image, conn = 4):
         elemt_struct = np.array([[1, 1, 1], [1, 1, 1], [1, 1, 1]])  # elemento estructurante para conectividad 8
     mask = np.copy(binary_image)
     labeled_image = np.zeros((len(binary_image), len(binary_image[0])))
-    tatuaje = 1
-    for i in range(len(binary_image)):
+    tatuaje = 1 # con lo que se va a marcar cada elemento del componenete conexo
+    for i in range(len(binary_image)): # se hace dilatación geodésica
         for j in range(len(binary_image[0])):
             if mask[i][j] == 1:
                 papel_cal = np.zeros((len(binary_image), len(binary_image[0])))
@@ -92,10 +92,10 @@ def MyConnComp_201719942_201822262(binary_image, conn = 4):
                     if np.array_equal(previo, papel_cal):
                         fin = True  # condición de parada: si el marcador anterior es igual al actual
                 mask = mask - papel_cal # se quita el componente conexo
-                labeled_image += tatuaje * papel_cal
-                tatuaje += 1
+                labeled_image += tatuaje * papel_cal # se modifica la matriz donde se guardan los componentes conexos
+                tatuaje += 1 # se aumenta el identificador de componente conexo
     pixel_labels = np.array([])
-    for t in range(1, tatuaje):
+    for t in range(1, tatuaje): # para todos los componentes conexos identificados se va a extraer los índices
         xces = []
         yes = []
         for z in range(len(labeled_image)):
@@ -103,15 +103,16 @@ def MyConnComp_201719942_201822262(binary_image, conn = 4):
                 if t == labeled_image[z][j]:
                     xces.append(z)
                     yes.append(j)
-        pixel_labels = np.append(pixel_labels, np.ravel_multi_index((xces, yes), (len(binary_image), len(binary_image[0]))))
+        pixel_labels = np.append(pixel_labels, np.ravel_multi_index((xces, yes), (len(binary_image), len(binary_image[0])))) # se extraen los índices correspondientes al componente conexo
     return labeled_image, pixel_labels
 prueba_frutas=io.imread(os.path.join('data_mp3', 'fruits_binary.png')) # se importa la imagen de prueba
+# se binariza la imagen cambiando valores de 255 por 1
 for i in range(len(prueba_frutas)):
     for j in range(len(prueba_frutas[0])):
         if prueba_frutas[i][j]==255:
             prueba_frutas[i][j]=1
 ##input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
-plt.figure()
+plt.figure() # se plotea la imagen de las frutas sin utilizar el algoritmo de componentes conexos y con el algoritmo
 plt.subplot(1,2,1)
 plt.title("Imagen original")
 plt.axis("off")
@@ -122,10 +123,11 @@ plt.axis("off")
 plt.imshow(MyConnComp_201719942_201822262(prueba_frutas)[0],cmap="gray")
 plt.show()
 ##input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
+# se crean 2 imágenes binarias 20 X 20
 imagen_creada1=np.array([[0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0],[0,1,1,0,1,1,1,0,1,1,0,0,0,0,0,0,0,0,0,0],[1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0],[1,0,1,1,1,1,1,1,1,0,1,0,0,0,0,0,0,0,0,0],[1,0,1,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0],[0,0,0,1,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,0,0],[0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,1,0,1,1,0],[0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1],[0,0,0,0,0,0,0,0,0,1,0,1,1,1,1,1,1,1,0,1],[0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,1,0,1],[0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,0,0,0],[0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0], [0,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0],[1,1,0,1,1,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0]])
 imagen_creada2=np.array([[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,1],[0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1,1],[0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1],[0,1,1,1,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,1,1,1,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0],[0,0,1,1,1,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0],[0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[1,1,1,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,1,1,1,0,1,1,1,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0]])
 ##input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
-plt.figure("vecindad_4_8_Dif")
+plt.figure("vecindad_4_8_Dif") # se aplica el algoritmo para la primera imagen con dos vecindades diferentes y se muestran. se muestra también la imagen original
 plt.subplot(1,3,1)
 plt.title("Imagen original")
 plt.axis("off")
@@ -140,7 +142,7 @@ plt.axis("off")
 plt.imshow(MyConnComp_201719942_201822262(imagen_creada1,conn=8)[0],cmap="gray")
 plt.show()
 ##input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
-plt.figure("vecindad_4_8_Igual")
+plt.figure("vecindad_4_8_Igual") # se aplica el algoritmo para la primera imagen con dos vecindades diferentes y se muestran. se muestra también la imagen original
 plt.subplot(1,3,1)
 plt.title("Imagen original")
 plt.axis("off")
@@ -158,26 +160,26 @@ plt.show()
 img = glob.glob(os.path.join('data_mp3','blood_cell_dataset', 'noisy_data', '*.png')) # se importan las imágenes
 #num_rand=random.randint(0,9) #proceso para hallar imagen de prueba de forma aleatoria
 #print(num_rand) #=7
-carga_prueba=io.imread(img[7])
-def preprocesamiento(carga_color_image):
+carga_prueba=io.imread(img[7]) # imagen para realizar las pruebas
+def preprocesamiento(carga_color_image): # función para preprocesar las imágenes
     imagen_en_Lab = cv2.cvtColor(carga_color_image, cv2.COLOR_BGR2LAB)  # se convierte de rgb a Lab con librería cv2
-    filtrado = cv2.medianBlur(imagen_en_Lab, 7)
+    filtrado = cv2.medianBlur(imagen_en_Lab, 7) #se filtra la imagen
     filtrado_grises = cv2.cvtColor(cv2.cvtColor(filtrado, cv2.COLOR_LAB2RGB),cv2.COLOR_RGB2GRAY)  # se convierte de rgb a Lab con librería cv2
     return filtrado_grises
-def gradiente_morfo(image):
+def gradiente_morfo(image): # función para calcular el gradiente morfologico
     dilatacion=morfo.dilation(image)
     erosion=morfo.erosion(image)
-    return dilatacion-erosion
-def watershed_select(image,marcadores=False,min_h=40):
-    grad=gradiente_morfo(image)
-    if marcadores==True:
+    return dilatacion-erosion # con librería se calculan los valores y se retorna la resta
+def watershed_select(image,marcadores=False,min_h=40): # función para calcular watershed
+    grad=gradiente_morfo(image) # se saca el gradiente morfologico
+    if marcadores==True: # si se va a calcular con marcadores se utiliza la funcion h_minima
         marks=morfo.h_minima(image,min_h)
-        conexos=MyConnComp_201719942_201822262(marks)[0]
-        return segmen.watershed(grad,markers=conexos,watershed_line=True) ,conexos
+        conexos=MyConnComp_201719942_201822262(marks)[0] # se sacan componentes conexos
+        return segmen.watershed(grad,markers=conexos,watershed_line=True) ,conexos # se hace watershed
     else:
-        return segmen.watershed(grad,watershed_line=True)
+        return segmen.watershed(grad,watershed_line=True) # por default se hace watershed sin marcadores
 ##input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
-plt.figure()
+plt.figure() # se plotean las imágenes resultantes
 plt.subplot(1,3,1)
 plt.title("Imagen original preprocesada")
 plt.axis("off")
@@ -192,7 +194,7 @@ plt.axis("off")
 plt.imshow(watershed_select(preprocesamiento(carga_prueba)),cmap="gray")
 plt.show()
 ##input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
-plt.figure()
+plt.figure() # se plotean las imágenes resultantes
 plt.subplot(2,2,1)
 plt.title("Imagen original preprocesada")
 plt.axis("off")
@@ -237,18 +239,18 @@ segm_water={} # lista para almacenar imágenes
 jaccards_sinmark={}
 jaccards_mark={}
 index_im = 0
-for i in img:
-    carga_color=io.imread(i)
-    preprocesa=preprocesamiento(carga_color)
-    segm_sinmarcadores=watershed_select(preprocesa)>0
-    segm_marcadores=watershed_select(preprocesa,marcadores=True,min_h=255-threshold_otsu(preprocesa))[0]
-    segm_marcadores_bin = segm_marcadores.copy()
-    moda = mode(segm_marcadores_bin.flatten())[0]
-    for i in range(len(segm_marcadores_bin)):
-        for j in range(len(segm_marcadores_bin[0])):
+for i in img: # se recorren las imagenes
+    carga_color=io.imread(i) # se leen
+    preprocesa=preprocesamiento(carga_color)  # se preprocesan
+    segm_sinmarcadores=watershed_select(preprocesa)>0 # se hace watershed sin marcadores
+    segm_marcadores=watershed_select(preprocesa,marcadores=True,min_h=255-threshold_otsu(preprocesa))[0] # se hace watershed son marcadores con umbral especificado
+    segm_marcadores_bin = segm_marcadores.copy() # se copia el resultado
+    moda = mode(segm_marcadores_bin.flatten())[0] # se obtiene el valor del fondo a través de la moda
+    for i in range(len(segm_marcadores_bin)): # se recorre la imagen para realizar una binarización
+        for j in range(len(segm_marcadores_bin[0])): # si no es fondo se convierte en 1
             if segm_marcadores_bin[i][j] < moda or segm_marcadores_bin[i][j] > moda:
                 segm_marcadores_bin[i][j] = 1
-            else:
+            else: # si es fondo se convierte en 0
                 segm_marcadores_bin[i][j] = 0
     #plt.imshow(segm_marcadores_bin, cmap="gray")
     i_dict, i_anota = index_im, index_im  # indices correspondientes al número de la imagen
