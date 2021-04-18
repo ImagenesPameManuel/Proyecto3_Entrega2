@@ -79,6 +79,7 @@ hematocrito_anota,hematocrito_llenas={},{} # diccionario para guardar las métri
 for i in img_anot:
     carga=io.imread(i)>0
     anota.append(carga) # se realiza la carga y umbralización de imagenes
+##
 for i in range(len(preprocesadas)):
     llena=MyHoleFiller_201719942_201822262(preprocesadas[i]).flatten() # se rellenan los huecos
     i_dict,i_anota=i,i #indices correspondientes al número de la imagen
@@ -296,7 +297,7 @@ def watershed_select(image,marcadores=False,min_h=40):
     if marcadores==True:
         marks=morfo.h_minima(image,min_h)
         conexos=MyConnComp_201719942_201822262(marks)[0]
-        return segmen.watershed(grad,markers=conexos,watershed_line=True)
+        return segmen.watershed(grad,markers=conexos,watershed_line=True) ,conexos
     else:
         return segmen.watershed(grad,watershed_line=True)
 ##
@@ -316,24 +317,48 @@ plt.imshow(watershed_select(preprocesamiento(carga_prueba)),cmap="gray")
 plt.show()
 ##input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
 plt.figure()
-plt.subplot(1,3,1)
+plt.subplot(2,2,1)
 plt.title("Imagen original preprocesada")
 plt.axis("off")
 plt.imshow(preprocesamiento(carga_prueba),cmap="gray")
-plt.subplot(1,3,2)
+plt.subplot(2,2,2)
 plt.title("Gradiente morfológico")
 plt.axis("off")
 plt.imshow(gradiente_morfo(preprocesamiento(carga_prueba)),cmap="gray")
-plt.subplot(1,3,3)
+plt.subplot(2,2,3)
+plt.title("Mardadores definidos")
+plt.axis("off")
+plt.imshow(watershed_select(preprocesamiento(carga_prueba),marcadores=True)[1],cmap="gray")
+plt.show()
+plt.subplot(2,2,4)
 plt.title("Watershed\nmardadores definidos")
 plt.axis("off")
-plt.imshow(watershed_select(preprocesamiento(carga_prueba),marcadores=True),cmap="gray")
+plt.imshow(watershed_select(preprocesamiento(carga_prueba),marcadores=True)[0],cmap="gray")
 plt.show()
 ##input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
-componentes_prueba=MyConnComp_201719942_201822262(watershed_select(gradiente_morfo(preprocesamiento(carga_prueba)),marcadores=True))
-##
-plt.imshow(preprocesamiento(carga_prueba),cmap="gray")
-plt.axis("off")
-##
-plt.imshow(morfo.h_minima((preprocesamiento(carga_prueba)),100),cmap="gray")
-##
+segm_water={} # lista para almacenar imágenes
+jaccards_sinmark={}
+jaccards_mark={}
+for i in img:
+    index_im=0
+    carga_color=io.imread(i)
+    preprocesa=preprocesamiento(carga_color)
+    segm_sinmarcadores=watershed_select(preprocesa)
+    segm_marcadores=watershed_select(preprocesa,marcadores=True)[0]
+    i_dict, i_anota = index_im, index_im  # indices correspondientes al número de la imagen
+    if index_im == 1:  # condicionales para excepciones en el orden correspondiente
+        i_dict = 10
+        i_anota = 0
+    elif index_im == 0:
+        i_dict = i + 1
+        i_anota = 1
+    segm_water[i_dict]=[preprocesa,segm_sinmarcadores,segm_marcadores]
+    jaccards_sinmark[i_dict] = skmetr.jaccard_score(anota[i_anota].flatten(), segm_sinmarcadores.flatten())  # cálculo de métricas y asignación de valores en los diccionarios haciendo uso de las anotaciones e imagenes correspondientes
+    jaccards_mark[i_dict] = skmetr.jaccard_score(anota[i_anota].flatten(), segm_marcadores.flatten())
+    index_im+=1
+valores_sinmark=np.array(list(jaccards_sinmark.values()))
+valores_mark=np.array(list(jaccards_mark.values()))
+print("\nÍndices de Jaccard imágenes watersheds sin marcadores:\n",jaccards_sinmark)
+print("prom sin marcadores",np.mean(valores_sinmark),"desv.est",np.std(valores_sinmark))
+print("\nÍndices de Jaccard imágenes con marcadores:\n",jaccards_mark)
+print("prom con marcadores",np.mean(valores_mark),"desv.est",np.std(valores_mark))
