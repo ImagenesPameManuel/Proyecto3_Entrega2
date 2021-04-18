@@ -10,6 +10,7 @@ import skimage.morphology as morfo
 import skimage.segmentation as segmen
 from scipy.ndimage import binary_dilation
 import sklearn.metrics as skmetr
+from scipy.stats import mode
 import matplotlib.pyplot as plt
 import os
 import cv2
@@ -333,7 +334,11 @@ plt.show()
 plt.subplot(2,2,4)
 plt.title("Watershed\nmardadores definidos")
 plt.axis("off")
-plt.imshow(watershed_select(preprocesamiento(carga_prueba),marcadores=True)[0],cmap="gray")
+#plt.imshow(watershed_select(preprocesamiento(carga_prueba),marcadores=True)[0]<mode(watershed_select(preprocesamiento(carga_prueba),marcadores=True)[0].flatten())[0]  ,cmap="gray")
+#bina_prueba=np.where(watershed_select(preprocesamiento(carga_prueba),marcadores=True,min_h=255-threshold_otsu(preprocesamiento(carga_prueba)))[0]<mode(watershed_select(preprocesamiento(carga_prueba),marcadores=True,min_h=255-threshold_otsu(preprocesamiento(carga_prueba)))[0].flatten())[0] , watershed_select(preprocesamiento(carga_prueba),marcadores=True,min_h=255-threshold_otsu(preprocesamiento(carga_prueba)))[0]>mode(watershed_select(preprocesamiento(carga_prueba),marcadores=True,min_h=255-threshold_otsu(preprocesamiento(carga_prueba)))[0].flatten())[0] ,1,0)
+#plt.imshow(bina_prueba ,cmap="gray")
+
+plt.imshow(watershed_select(preprocesamiento(carga_prueba),marcadores=True,min_h=255-threshold_otsu(preprocesamiento(carga_prueba)))[0] ,cmap="gray")
 plt.show()
 ##input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
 segm_water={} # lista para almacenar imágenes
@@ -344,13 +349,14 @@ for i in img:
     carga_color=io.imread(i)
     preprocesa=preprocesamiento(carga_color)
     segm_sinmarcadores=watershed_select(preprocesa)
-    segm_marcadores=watershed_select(preprocesa,marcadores=True)[0]
+    segm_marcadores=watershed_select(preprocesa,marcadores=True,min_h=255-threshold_otsu(preprocesa))[0]
+
     i_dict, i_anota = index_im, index_im  # indices correspondientes al número de la imagen
     if index_im == 1:  # condicionales para excepciones en el orden correspondiente
         i_dict = 10
         i_anota = 0
     elif index_im == 0:
-        i_dict = i + 1
+        i_dict = index_im+ 1
         i_anota = 1
     segm_water[i_dict]=[preprocesa,segm_sinmarcadores,segm_marcadores]
     jaccards_sinmark[i_dict] = skmetr.jaccard_score(anota[i_anota].flatten(), segm_sinmarcadores.flatten())  # cálculo de métricas y asignación de valores en los diccionarios haciendo uso de las anotaciones e imagenes correspondientes
