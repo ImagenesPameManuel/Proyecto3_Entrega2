@@ -260,9 +260,9 @@ for i in img: # se recorren las imagenes
     segm_water[i_dict]=[preprocesa,segm_sinmarcadores,segm_marcadores_bin]
     jaccards_sinmark[i_dict] = skmetr.jaccard_score(anota[i_anota].flatten(), segm_sinmarcadores.flatten())  # cálculo de métricas y asignación de valores en los diccionarios haciendo uso de las anotaciones e imagenes correspondientes
     jaccards_mark[i_dict] = skmetr.jaccard_score(anota[i_anota].flatten(), segm_marcadores_bin.flatten())
-    index_im+=1
-valores_sinmark=np.array(list(jaccards_sinmark.values()))
-valores_mark=np.array(list(jaccards_mark.values()))
+    index_im+=1 # aumento del índice
+valores_sinmark=np.array(list(jaccards_sinmark.values())) #creacion de lista para calcular métricas
+valores_mark=np.array(list(jaccards_mark.values())) #creacion de lista para calcular métricas
 # se muestran las métricas
 print("\nÍndices de Jaccard imágenes watersheds sin marcadores:\n",jaccards_sinmark)
 print("prom sin marcadores",np.mean(valores_sinmark),"desv.est",np.std(valores_sinmark))
