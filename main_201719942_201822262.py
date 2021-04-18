@@ -291,8 +291,12 @@ def gradiente_morfo(image):
     dilatacion=morfo.dilation(image)
     erosion=morfo.erosion(image)
     return dilatacion-erosion
-def watershed_sinmarcador(image,marcadores):
-    return segmen.watershed(image,watershed_line=True)
+def watershed_select(image,marcadores=False,min_h=100):
+    if marcadores==True:
+        marks=morfo.h_minima(image,min_h)
+        return segmen.watershed(image,mask=marks,watershed_line=True)
+    else:
+        return segmen.watershed(image,watershed_line=True)
 plt.figure()
 plt.subplot(1,3,1)
 plt.title("Imagen original preprocesada")
@@ -305,5 +309,23 @@ plt.imshow(gradiente_morfo(preprocesamiento(carga_prueba)),cmap="gray")
 plt.subplot(1,3,3)
 plt.title("Watershed sin\nmardadores definidos")
 plt.axis("off")
-plt.imshow(watershed_sinmarcador(gradiente_morfo(preprocesamiento(carga_prueba))),cmap="gray")
+plt.imshow(watershed_select(gradiente_morfo(preprocesamiento(carga_prueba))),cmap="gray")
 plt.show()
+##input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
+plt.figure()
+plt.subplot(1,3,1)
+plt.title("Imagen original preprocesada")
+plt.axis("off")
+plt.imshow(preprocesamiento(carga_prueba),cmap="gray")
+plt.subplot(1,3,2)
+plt.title("Gradiente morfológico")
+plt.axis("off")
+plt.imshow(gradiente_morfo(preprocesamiento(carga_prueba)),cmap="gray")
+plt.subplot(1,3,3)
+plt.title("Watershed\nmardadores definidos")
+plt.axis("off")
+plt.imshow(watershed_select(gradiente_morfo(preprocesamiento(carga_prueba)),marcadores=True),cmap="gray")
+plt.show()
+##input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
+componentes_prueba=MyConnComp_201719942_201822262(watershed_select(gradiente_morfo(preprocesamiento(carga_prueba)),marcadores=True))
+
