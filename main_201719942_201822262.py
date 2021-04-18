@@ -2,9 +2,12 @@
 #Manuel Gallegos Bustamante #Código: 201719942
 #Análisis y procesamiento de imágenes: Proyecto3 Entrega2
 #Se importan librerías que se utilizarán para el desarrollo del laboratorio
+import random
 import numpy as np
 from skimage.filters import threshold_otsu
 import skimage.io as io
+import skimage.morphology as morfo
+import skimage.segmentation as segmen
 from scipy.ndimage import binary_dilation
 import sklearn.metrics as skmetr
 import matplotlib.pyplot as plt
@@ -275,3 +278,32 @@ plt.axis("off")
 plt.imshow(MyConnComp_201719942_201822262(imagen_creada2,conn=8)[0],cmap="gray")
 plt.show()
 ##input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
+img = glob.glob(os.path.join('data_mp3','blood_cell_dataset', 'noisy_data', '*.png')) # se importan las imágenes
+#num_rand=random.randint(0,9) #proceso para hallar imagen de prueba de forma aleatoria
+#print(num_rand) #=7
+carga_prueba=io.imread(img[7])
+def preprocesamiento(carga_color_image):
+    imagen_en_Lab = cv2.cvtColor(carga_color_image, cv2.COLOR_BGR2LAB)  # se convierte de rgb a Lab con librería cv2
+    filtrado = cv2.medianBlur(imagen_en_Lab, 7)
+    filtrado_grises = cv2.cvtColor(cv2.cvtColor(filtrado, cv2.COLOR_LAB2RGB),cv2.COLOR_RGB2GRAY)  # se convierte de rgb a Lab con librería cv2
+    return filtrado_grises
+def gradiente_morfo(image):
+    dilatacion=morfo.dilation(image)
+    erosion=morfo.erosion(image)
+    return dilatacion-erosion
+def watershed_sinmarcador(image,marcadores):
+    return segmen.watershed(image,watershed_line=True)
+plt.figure()
+plt.subplot(1,3,1)
+plt.title("Imagen original preprocesada")
+plt.axis("off")
+plt.imshow(preprocesamiento(carga_prueba),cmap="gray")
+plt.subplot(1,3,2)
+plt.title("Gradiente morfológico")
+plt.axis("off")
+plt.imshow(gradiente_morfo(preprocesamiento(carga_prueba)),cmap="gray")
+plt.subplot(1,3,3)
+plt.title("Watershed sin\nmardadores definidos")
+plt.axis("off")
+plt.imshow(watershed_sinmarcador(gradiente_morfo(preprocesamiento(carga_prueba))),cmap="gray")
+plt.show()
